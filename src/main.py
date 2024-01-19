@@ -40,4 +40,11 @@ class YouTubeDownloader:
         print(f'TotalSize of {total_size:.2f} MB download completed. file saved to: {filepath}')
 
 
+if __name__ == "__main__":
+    while True:
+        url = input('Please Enter the URL of your desired video:')
+        if "youtube.com" not in url:
+            print('Invalid URL! Please Enter YOUTUBE link')
         
+        else:
+            YouTubeDownloader(url).download()
