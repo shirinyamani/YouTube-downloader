@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pytube
 from pytube import YouTube
+from tqdm import tqdm
 
 
 class YouTubeDownloader:
@@ -13,7 +14,7 @@ class YouTubeDownloader:
             self.url, 
             on_progress_callback=self.on_progress,
             on_complete_callback=self.complete)
-
+        
 
     def download(self):
         if self.quality == 'highest':
@@ -26,19 +27,25 @@ class YouTubeDownloader:
                 progressive=True, 
                 file_extension='mp4', 
                 res=self.quality).first()
+            
+        self.pbar = tqdm(desc='Downloading...', 
+                         total = stream.filesize,
+                         unit= 'B',
+                         unit_scale= True)
+
         
         stream.download(self.output_save_path)
 
     def on_progress(self,stream, chunk, byte_remaining):
-        total_size = stream.filesize
-        byte_downloaded = total_size - byte_remaining
-        print(f'downloading...{byte_downloaded/total_size*100:.2f} % of {stream.title}')
+        current = stream.filesize - byte_remaining
+        self.pbar.update(current - self.pbar.n)
+
 
     def complete(self, stream, filepath):
-        total_size = stream.filesize / 1024 /1024
         print()
-        print(f'TotalSize of {total_size:.2f} MB download completed. file saved to: {filepath}')
-
+        print(f'Download completed and saved in {filepath}')
+        
+        
 
 if __name__ == "__main__":
     while True:
