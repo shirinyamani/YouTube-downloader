@@ -4,6 +4,7 @@ from pathlib import Path
 import pytube
 from pytube import YouTube
 from tqdm import tqdm
+from pytube.exceptions import VideoUnavailable
 
 
 class YouTubeDownloader:
@@ -18,33 +19,44 @@ class YouTubeDownloader:
         
 
     def download(self):
-        if self.quality == 'highest':
-            stream = self.yt.streams.filter(
-                progressive=True, 
-                file_extension='mp4'
-                ).get_highest_resolution()
-        else:
-            stream = self.yt.streams.filter(
-                progressive=True, 
-                file_extension='mp4', 
-                res=self.quality).first()
+
+        try:
+            if self.quality == 'highest':
+                stream = self.yt.streams.filter(
+                    progressive=True, 
+                    file_extension='mp4'
+                    ).get_highest_resolution()
+            else:
+                stream = self.yt.streams.filter(
+                    progressive=True, 
+                    file_extension='mp4', 
+                    res=self.quality).first()
+                
+            self.pbar = tqdm(desc='Downloading...', 
+                            total = stream.filesize,
+                            unit= 'B',
+                            unit_scale= True)
+
             
-        self.pbar = tqdm(desc='Downloading...', 
-                         total = stream.filesize,
-                         unit= 'B',
-                         unit_scale= True)
+            stream.download(self.output_save_path)
 
-        
-        stream.download(self.output_save_path)
+        except VideoUnavailable:
+            print('Invalid URL!')
+            exit(1)
 
+        except Exception as e:
+            print(e)
+            exit(1)
+    
+    
     def on_progress(self,stream, chunk, byte_remaining):
         current = stream.filesize - byte_remaining
         self.pbar.update(current - self.pbar.n)
 
 
     def complete(self, stream, filepath):
-        print()
-        print(f'Download completed and saved in {filepath}')
+        pass
+        #print(f'Download completed and saved in {filepath}')
         
         
 
