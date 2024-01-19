@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 
 import pytube
@@ -48,10 +49,20 @@ class YouTubeDownloader:
         
 
 if __name__ == "__main__":
-  
-    url = input('Please Enter the URL of your desired video:')
-    if "youtube.com" not in url:
-        print('Invalid URL! Please Enter YOUTUBE link')
+        
+
+        parser = argparse.ArgumentParser(
+        description= 'Youtube Downloader'
+        )
+
+        parser.add_argument('url',help='youtube video URL')
+        parser.add_argument('-q','--quality', help='enter your desired quality', default='highest')
+        parser.add_argument('-o','--output_save_path', help='path for video', default=None)
+
+        args = parser.parse_args()
     
-    else:
-        YouTubeDownloader(url).download()
+        YouTubeDownloader(
+             url=args.url,
+             quality=args.quality,
+             output_save_path=args.output_save_path
+        ).download()
