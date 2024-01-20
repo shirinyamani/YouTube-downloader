@@ -4,7 +4,7 @@ from pathlib import Path
 import pytube
 from pytube import YouTube
 from tqdm import tqdm
-from pytube.exceptions import VideoUnavailable
+from pytube.exceptions import VideoUnavailable, RegexMatchError
 
 
 class YouTubeDownloader:
@@ -19,34 +19,28 @@ class YouTubeDownloader:
         
 
     def download(self):
-
         try:
-            if self.quality == 'highest':
-                stream = self.yt.streams.filter(
-                    progressive=True, 
-                    file_extension='mp4'
-                    ).get_highest_resolution()
-            else:
-                stream = self.yt.streams.filter(
-                    progressive=True, 
-                    file_extension='mp4', 
-                    res=self.quality).first()
-                
-            self.pbar = tqdm(desc='Downloading...', 
-                            total = stream.filesize,
-                            unit= 'B',
-                            unit_scale= True)
-
-            
-            stream.download(self.output_save_path)
-
+            self.yt.check_availability()
         except VideoUnavailable:
-            print('Invalid URL!')
-            exit(1)
-
-        except Exception as e:
-            print(e)
-            exit(1)
+            print('Video Unavaiable!')
+            return 
+        if self.quality == 'highest':
+            stream = self.yt.streams.filter(
+                progressive=True, 
+                file_extension='mp4'
+                ).get_highest_resolution()
+        else:
+            stream = self.yt.streams.filter(
+                progressive=True, 
+                file_extension='mp4', 
+                res=self.quality).first()
+            
+        self.pbar = tqdm(desc=':): Downloading...', 
+                        total = stream.filesize,
+                        unit= 'B',
+                        unit_scale= True)
+        
+        stream.download(self.output_save_path)
     
     
     def on_progress(self,stream, chunk, byte_remaining):
@@ -61,8 +55,6 @@ class YouTubeDownloader:
         
 
 if __name__ == "__main__":
-        
-
         parser = argparse.ArgumentParser(
         description= 'Youtube Downloader'
         )
