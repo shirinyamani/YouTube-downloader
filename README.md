@@ -1,4 +1,3 @@
-# YouTube-downloader
 ![logo](./img/logo.jpg)
 
 Welcome to the YouTube Downloader Project! In this project, you will develop a Python application that allows users to download YouTube videos for offline viewing. Your mission is to create a Python script that takes a YouTube video URL as input and downloads the video to the user's local system. This project will provide a hands-on experience with the pytube library, user input handling, and feedback mechanisms such as a download progress bar.
